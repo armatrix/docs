@@ -1,7 +1,7 @@
 {
-  "index": "Introduction",
-  "another": "Another Page",
-  "advanced": "Advanced (A Folder)",
+  "index": "Hi",
+  "GCPEnv": "GCP environment",
+  "testCode": "Test Code",
   "about": {
     "title": "About",
     "type": "page"
@@ -9,7 +9,7 @@
   "contact": {
     "title": "Contact ↗",
     "type": "page",
-    "href": "https://twitter.com/shuding_",
+    "href": "https://twitter.com/defi88888888",
     "newWindow": true
   }
 }

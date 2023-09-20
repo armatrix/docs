@@ -1,0 +1,102 @@
+## build dev env in GCP
+
+### check the env
+
+```bash
+# uname -a
+Linux instance-1 5.10.0-25-cloud-amd64 #1 SMP Debian 5.10.191-1 (2023-08-16) x86_64 GNU/Linux
+```
+
+### install docker env
+
+```bash
+# uninstall all conflicting pkgs
+for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done
+
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+# install the latest version
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# verify
+sudo docker run hello-world
+
+# add privilege
+sudo cat /etc/group | grep docker
+sudo usermod -aG docker <username>
+sudu systemctl restart docker
+```
+
+### update python env(using pyenv)
+
+```bash
+# optional update python3.9.2(default) to 3.10.x
+# normally its should have a default python3 version, if not, trying:
+sudo apt install python3 python3-pip
+# verify python version
+python3 --version
+
+# update to new version
+# install dependencies, build env etc.
+sudo apt install build-essential
+sudo apt install libssl-dev libsqlite3-dev libbz2-dev libgdbm-dev libncurses5-dev libncursesw5-dev libreadline-dev zlib1g-dev libffi-dev
+
+# manage python env using pyenv
+# install curl & git if needed
+sudo apt install curl
+sudo apt install git
+curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+
+# add pyenv to shell configuration
+echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+source ~/.bashrc
+
+# list current versions
+pyenv versions
+
+# install the desired python version
+# e.g: pyenv install 3.10
+pyenv install 3.<x>.<x>
+
+# set global or local python version
+# e.g:
+## pyenv global 3.10.13
+## pyenv local 3.10.13
+pyenv global 3.<x>.<x>
+pyenv local 3.<x>.<x>
+
+# restart or open a new terminal to verify
+python3 --version
+```
+
+### some middleware with docker
+
+```bash
+# create simple dir for data persistence, should use data volume instead. only in dev mode
+mkdir -p $HOME/docker-tmp
+
+# mysql
+docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=admin -d mysql
+# redis
+docker run --name redis -p 6379:6379 -d redis
+# rabbitmq
+docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 -p 25672:25672 -v $HOME/docker-tmp/rabbitmq:/var/lib/rabbitmq --hostname myRabbit -e RABBITMQ_DEFAULT_VHOST=matrix  -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin rabbitmq:management
+# nginx
+docker run -p 80:80 --name nginx -v $HOME/docker-tmp/nginx:/usr/share/nginx/html:ro -d nginx
+# mongo
+docker run -d -p 27017:27017 --name mongo -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=somepwd mongo mongod --auth
+```
