@@ -1,5 +1,10 @@
 import { useRouter } from "next/router"
 import { DocsThemeConfig, useConfig } from "nextra-theme-docs"
+const defaults = {
+  title: "armatrix",
+  description: "github.com/armatrix/docs",
+  image: "",
+}
 const config: DocsThemeConfig = {
   head: () => {
     const { asPath, defaultLocale, locale } = useRouter()
@@ -11,11 +16,25 @@ const config: DocsThemeConfig = {
     return (
       <>
         <meta property="og:url" content={url} />
-        <meta property="og:title" content={frontMatter.title || "armtrix"} />
+        <meta property="og:title" content={frontMatter.title || "armatrix"} />
         <meta
           property="og:description"
           content={frontMatter.description || "github.com/armatrix/docs"}
         />
+
+        <meta
+          name="twitter:title"
+          content={frontMatter.title || defaults.title}
+        />
+        <meta
+          name="twitter:description"
+          content={frontMatter.description || defaults.description}
+        />
+        <meta
+          name="twitter:image"
+          content={frontMatter.image || defaults.image}
+        />
+        <meta name="twitter:card" content="summary_large_image" />
       </>
     )
   },
