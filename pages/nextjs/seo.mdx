@@ -1,0 +1,40 @@
+SEO headers
+
+```html
+import Head from 'next/head';
+
+const defaults = {
+  title: ``,
+  description: ``,
+  image: ``,
+  url: ``
+}
+
+export default (props)=>(
+  <Head>
+
+    <title>{props.title || defaults.title}</title>
+    <meta name="description" content={props.description || defaults.description} />
+
+    {/*<!-- Google / Search Engine Tags -->*/}
+    <meta itemprop="name" content={props.title || defaults.title} />
+    <meta itemprop="description" content={props.description || defaults.description} />
+    <meta itemprop="image" content={props.image || defaults.image} />
+
+    {/*<!-- Facebook Meta Tags -->*/}
+    <meta property="og:title" content={props.title || defaults.title} />
+    <meta property="og:description" content={props.description || defaults.description} />
+    <meta property="og:image" content={props.image || defaults.image} />
+    <meta property="og:url" content={props.title || defaults.title} />
+    <meta property="og:type" content="website" />
+
+    {/*<!-- Twitter Meta Tags -->*/}
+    <meta name="twitter:title" content={props.title || defaults.title} />
+    <meta name="twitter:description" content={props.description || defaults.description} />
+    <meta name="twitter:image" content={props.image || defaults.image} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+  </Head>
+)
+```
+
